@@ -3,16 +3,16 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prismadb";
 import { pusherServer } from "@/app/libs/pusher";
 
-interface IParams {
-    conversationId?: string;
-}
+type Params = Promise<{ conversationId : string }>
+
 
 export async function DELETE(
     request: Request,
-    { params }: { params: IParams },
+     props : { params: Params },
 ) {
     try {
-        const { conversationId } = params;
+        const params = await props.params
+        const  conversationId  = params.conversationId;
         const currentUser = await getCurrentUser();
 
         if (!currentUser?.id) {
