@@ -5,13 +5,11 @@ import Header from "./components/Header";
 import Body from "./components/Body";
 import Form from "./components/Form";
 
-interface IParams {
-    conversationId: string;
-}
-
-const ConversationPage = async ({ params }: { params: IParams }) => {
+type Params = Promise<{ conversationId : string }>
+const ConversationPage = async ( props : { params: Params }) => {
     try {
-        const { conversationId } = await params;
+        const params = await props.params
+        const  conversationId  = params.conversationId;
 
         const conversation = await getConversationById(conversationId);
         const messages = await getMessages(conversationId);
