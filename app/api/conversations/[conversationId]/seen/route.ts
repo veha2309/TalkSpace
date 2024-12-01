@@ -3,17 +3,16 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prismadb";
 import { pusherServer } from "@/app/libs/pusher";
 
-interface IParams {
-    conversationId?: string;
-}
+type Params = Promise<{ conversationId: string }>
 
 export async function POST(
     request: Request,
-    { params }: { params: IParams }
+    props: { params: Params },
 ) {
     try {
         const currentUser = await getCurrentUser();
-        const { conversationId } = await params;
+        const params = await props.params
+        const conversationId = params.conversationId;
 
         if (!currentUser?.email || !currentUser?.id) {
             return new NextResponse("Unauthorized", { status: 401 });
