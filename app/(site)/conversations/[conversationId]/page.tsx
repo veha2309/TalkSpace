@@ -5,11 +5,7 @@ import Header from "./components/Header";
 import Body from "./components/Body";
 import Form from "./components/Form";
 
-interface Iparams {
-    conversationId: string
-}
-
-const ConversationPage = async ({ params }: { params: Iparams }) => {
+const ConversationPage = async ({ params }: { params: Record<string, string> }) => {
     try {
         const conversation = await getConversationById(params.conversationId);
         const messages = await getMessages(params.conversationId);
