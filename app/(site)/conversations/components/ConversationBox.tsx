@@ -16,17 +16,9 @@ interface ConversationBoxProps {
 }
 
 const ConversationBox: React.FC<ConversationBoxProps> = ({ data, selected }) => {
-    const [mounted, setMounted] = useState(false);
     const otherUser = useOtherUser(data);
     const session = useSession();
     const router = useRouter();
-
-    useEffect(() => {
-        setMounted(true);
-    }, []);
-
-    // Return early if not mounted to prevent SSR mismatch
-    if (!mounted) return null;
 
     // Define memoized values and callbacks
     const handleClick = useCallback(() => {
