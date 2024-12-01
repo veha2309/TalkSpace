@@ -33,7 +33,8 @@ const ConversationPage = async ({ params }: { params: Iparams }) => {
                 </div>
             </div>
         );
-    } catch (error) {
+    } catch (error : unknown) {
+        console.log("CONVERSATION_LOADING_ERROR : " , error)
         return (
             <div className="lg:pl-80 h-full">
                 <div className="h-full flex flex-col">

@@ -25,8 +25,10 @@ const ConversationBox: React.FC<ConversationBoxProps> = ({ data, selected }) => 
         setMounted(true);
     }, []);
 
-    if (!mounted) return null; // Prevent SSR mismatch
+    // Return early if not mounted to prevent SSR mismatch
+    if (!mounted) return null;
 
+    // Define memoized values and callbacks
     const handleClick = useCallback(() => {
         router.push(`/conversations/${data.id}`);
     }, [data.id, router]);

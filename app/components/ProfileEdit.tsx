@@ -17,7 +17,6 @@ import {
 } from "@/components/ui/dialog"
 
 import { User } from "@prisma/client";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
@@ -30,11 +29,6 @@ interface ProfileEditProps {
     currentUser: User
 }
 
-interface UploadResult {
-    info: {
-        secure_url: string
-    }
-}
 const ProfileEdit: React.FC<ProfileEditProps> = ({
     isOpen,
     onClose,
@@ -48,7 +42,6 @@ const ProfileEdit: React.FC<ProfileEditProps> = ({
     const {
         register,
         handleSubmit,
-        setValue,
         reset,
     } = useForm<FieldValues>({
         defaultValues: {
