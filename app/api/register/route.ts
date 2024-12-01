@@ -32,11 +32,12 @@ export async function POST(request: Request) {
         });
 
         // Exclude sensitive fields from the response
-        const { hashedPassword: _, ...userWithoutPassword } = newUser;
 
-        return NextResponse.json(userWithoutPassword);
+        
 
-    } catch (error: any) {
+        return NextResponse.json(newUser);
+
+    } catch (error: unknown) {
         console.error("REGISTRATION_ERROR:", error);
         return new NextResponse("Internal Server Error", { status: 500 });
     }

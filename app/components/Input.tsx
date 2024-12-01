@@ -12,7 +12,7 @@ interface InputProps {
     required?: boolean;
     errors?: FieldErrors;
     register?: UseFormRegister<FieldValues>
-    onChange ?: (e : any) => void
+    onChange ?: (e : React.ChangeEvent<HTMLInputElement>) => void
     className ?: string
     value ?: string
 }

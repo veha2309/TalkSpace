@@ -1,19 +1,7 @@
 'use client'
 import EmptyState from "@/app/components/EmptyState";
-import { signOut } from "next-auth/react";
-
-
-
 
 const Home = () => {
-
-
-
-
-    const handleClick = () => {
-        signOut({ callbackUrl: '/', redirect: true });
-    }
-
 
     return (
         <>

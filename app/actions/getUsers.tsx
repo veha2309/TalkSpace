@@ -24,6 +24,7 @@ const getUsers = async () => {
         return users;
 
     } catch (error:unknown) {
+        console.error("GETTING_USER_ERROR :", error);
         return [];
     }
 }

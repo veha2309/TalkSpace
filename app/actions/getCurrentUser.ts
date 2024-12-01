@@ -16,6 +16,7 @@ const getCurrentUser = async () => {
         if(!currentUser) return null
         return currentUser
     } catch (error:unknown) {
+        console.error("GETTING CURRENT_USER_ERROR :", error);
         return null
     }
 }

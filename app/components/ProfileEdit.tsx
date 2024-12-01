@@ -5,7 +5,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button";
 import Input from "@/app/components/Input";
 
-import { CldUploadButton } from 'next-cloudinary';
 
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 
@@ -23,7 +22,6 @@ import { useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import LoadingModal from "@/app/components/LoadingModal";
-import ImageUplaod from "./ImageUpload";
 
 
 interface ProfileEditProps {
@@ -43,7 +41,6 @@ const ProfileEdit: React.FC<ProfileEditProps> = ({
     currentUser,
 }) => {
 
-    const router = useRouter();
     const [isLoading, setIsLoading] = useState(false);
     const [isValid, setIsValid] = useState(false);
 
@@ -52,11 +49,7 @@ const ProfileEdit: React.FC<ProfileEditProps> = ({
         register,
         handleSubmit,
         setValue,
-        watch,
         reset,
-        formState: {
-            errors,
-        }
     } = useForm<FieldValues>({
         defaultValues: {
             name: currentUser?.name,
@@ -73,12 +66,6 @@ const ProfileEdit: React.FC<ProfileEditProps> = ({
         setIsLoading(false);
         reset({ password: "" });
         onClose();
-    }
-
-    const handleUpload = (result: UploadResult) => {
-        setValue('image', result?.info?.secure_url, {
-            shouldValidate: true
-        })
     }
 
     const handleValidation = () => {

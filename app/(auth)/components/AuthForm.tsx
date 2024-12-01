@@ -15,7 +15,7 @@ import LoadingModal from "@/app/components/LoadingModal";
 type Variant = "LOGIN" | "REGISTER"
 
 const AuthForm = () => {
-    const { data, status } = useSession();
+    const { status } = useSession();
     const [isLoading, setLoading] = useState(false);
     const [variant, setVariant] = useState<Variant>("REGISTER");
     const router = useRouter();
@@ -24,7 +24,7 @@ const AuthForm = () => {
         if (status === "authenticated") {
             router.push("/home")
         }
-    }, [status])
+    }, [status, router])
 
     const {
         register,

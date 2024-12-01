@@ -2,7 +2,6 @@ import { useState } from "react";
 import { CldUploadWidget } from "next-cloudinary";
 
 const CustomUploader = () => {
-  const [image, setImage] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
 
   return (
@@ -15,8 +14,7 @@ const CustomUploader = () => {
           multiple: false, // Allow only single file upload
         }}
         onUpload={() => setIsUploading(true)} // Set uploading state
-        onSuccess={(result: any) => {
-          setImage(result?.info.secure_url); // Save the uploaded image URL
+        onSuccess={() => {
           setIsUploading(false);
         }}
         onError={(error) => {

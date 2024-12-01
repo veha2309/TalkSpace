@@ -1,5 +1,3 @@
-
-import prisma from "@/lib/prismadb";
 import { NextResponse } from "next/server";
 import bcrypt from "bcrypt"
 import getCurrentUser from "@/app/actions/getCurrentUser";
