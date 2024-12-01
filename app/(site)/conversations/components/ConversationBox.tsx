@@ -1,7 +1,7 @@
 'use client'
 
 import { FullConversationType } from "@/app/types";
-import { useCallback, useMemo, useState, useEffect } from "react";
+import { useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 import { useSession } from "next-auth/react";
