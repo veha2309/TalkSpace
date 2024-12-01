@@ -7,14 +7,14 @@ const getMessages = async (conversationId: string) => {
                 conversationId,
             },
             include: {
-                sender: true,
+                sender: true, // Include sender details
             },
             orderBy: {
-                createdAt: "asc",
+                createdAt: "asc", // Ensure chronological order
             },
         });
 
-        // Fetch user data for `seenBy` user IDs
+        // Fetch users for `seenBy` for each message and resolve the PrismaPromise
         const messagesWithSeenBy = await Promise.all(
             messages.map(async (message) => {
                 const seenUsers = await prisma.user.findMany({
@@ -25,16 +25,17 @@ const getMessages = async (conversationId: string) => {
                     },
                 });
 
+                // Return message with resolved `seenBy` as a list of user ids
                 return {
                     ...message,
-                    seen: seenUsers, // Add the full User objects for seenBy
+                    seenBy: seenUsers.map(user => user.id), // Only include user ids in `seenBy`
                 };
             })
         );
 
         return messagesWithSeenBy;
     } catch (error) {
-        console.error(error);
+        console.error("Error in getMessages:", error);
         return [];
     }
 };
