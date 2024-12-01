@@ -1,0 +1,80 @@
+import { NextAuthOptions } from "next-auth";
+import CredentialsProvider from "next-auth/providers/credentials";
+import GitHubProvider from "next-auth/providers/github";
+import { PrismaAdapter } from "@next-auth/prisma-adapter";
+import prismadb from "@/lib/prismadb";
+import bcrypt from "bcrypt";
+
+export const authOptions: NextAuthOptions = {
+    debug: true,
+    adapter: PrismaAdapter(prismadb),
+    providers: [
+        CredentialsProvider({
+            name: "Credentials",
+            credentials: {
+                email: { label: "Email", type: "email", placeholder: "example@example.com" },
+                password: { label: "Password", type: "password" },
+            },
+            async authorize(credentials) {
+                const { email, password } = credentials || {};
+                if (!email || !password) {
+                    throw new Error("Email and password are required.");
+                }
+
+                // Find the user in the database
+                const user = await prismadb.user.findUnique({ where: { email } });
+                if (!user) {
+                    throw new Error("Invalid email or password.");
+                }
+
+                // Verify the password
+                const isValidPassword = await bcrypt.compare(password, user.hashedPassword || "");
+                if (!isValidPassword) {
+                    throw new Error("Invalid email or password.");
+                }
+
+                // Return user object if authentication is successful
+                return user;
+            },
+        }),
+        GitHubProvider({
+            clientId: process.env.GITHUB_CLIENT_ID!,
+            clientSecret: process.env.GITHUB_CLIENT_SECRET!,
+        }),
+    ],
+    session: {
+        strategy: "jwt",
+    },
+    callbacks: {
+        async jwt({ token, user }) {
+            if (user) {
+                token.id = user.id;
+                token.email = user.email;
+            }
+            return token;
+        },
+        async session({ session, token }) {
+            if (token) {
+                session.user = {
+                    id: token.id,
+                    email: token.email,
+                };
+            }
+            return session;
+        },
+    },
+    secret: process.env.NEXTAUTH_SECRET,
+};
+
+
+
+
+
+
+
+
+
+
+
+
+TalkSpace_77776633442<388833-32668

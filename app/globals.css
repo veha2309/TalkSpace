@@ -2,20 +2,51 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+body {
+  font-family: Arial, Helvetica, sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --radius: 0.5rem;
   }
 }
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+
+.text {
+  border-right: 3px solid;
+  white-space: nowrap;
+  overflow: hidden;
+  animation: 
+    typing 2s ,
+    cursor .4s step-end infinite alternate;
+}
+
+@keyframes cursor{
+  50% {border-color: transparent;}
+}
+
+@keyframes typing{
+  from {width: 0;}
+}
+
+
+.bg-video{
+  position: fixed;
+  z-index: -1;
+
+}
+
+@media (min-aspect-ratio : 16/9){
+  .bg-video{
+    width: 100%;
+    height: auto;
+  }
+}
+
+@media (max-aspect-ratio : 16/9){
+  .bg-video{
+    width: auto;
+    height: 100%;
+  }
 }

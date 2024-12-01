@@ -1,0 +1,88 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             String         @id @default(auto()) @map("_id") @db.ObjectId
+  name           String
+  email          String         @unique
+  hashedPassword String?
+  image          String?
+  emailVerified  DateTime?
+
+  conversations  ConversationUser[]
+  messages       Message[]
+  accounts       Account[]
+
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  Session        Session[]
+}
+
+
+model Conversation {
+  id          String  @id @default(auto()) @map("_id") @db.ObjectId
+  name        String? // Optional name for group conversations
+  isGroup     Boolean @default(false)
+  participants ConversationUser[] // Link to participants in the conversation 
+  messages     Message[]            // Link to the messages within the conversation
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  userIds     String[] @db.ObjectId  // List of user IDs in the conversation
+  
+  deletedBy   String[] @db.ObjectId  // Array of user IDs who have deleted the conversation
+}
+
+model Message {
+  id             String       @id @default(auto()) @map("_id") @db.ObjectId
+  content        String
+  senderId       String       @db.ObjectId
+  sender         User         @relation(fields: [senderId], references: [id])
+  conversationId String       @db.ObjectId
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+  createdAt      DateTime     @default(now())
+  seenBy         String[]     // Array of user IDs who have seen the message
+
+  image          String?      // Optional message image
+}
+
+
+model ConversationUser {
+  id             String       @id @default(auto()) @map("_id") @db.ObjectId
+  userId         String       @db.ObjectId // User ID for the participant
+  conversationId String       @db.ObjectId // Conversation ID
+  user           User         @relation(fields: [userId], references: [id]) // Relation to the User model
+  conversation   Conversation @relation(fields: [conversationId], references: [id]) // Relation to the Conversation model
+  createdAt      DateTime     @default(now()) // Timestamp when the user was added to the conversation
+}
+
+model Account {
+  id                String  @id @default(auto()) @map("_id") @db.ObjectId
+  userId            String  @db.ObjectId // User ID associated with the account
+  type              String  // Account type (e.g., "google", "facebook", etc.)
+  provider          String  // Authentication provider (e.g., "google")
+  providerAccountId String  // Provider account ID (e.g., google account ID)
+  refresh_token     String? @db.String // Refresh token for OAuth
+  access_token      String? @db.String // Access token for OAuth
+  expires_at        Int?    // Expiration time for OAuth tokens
+  token_type        String? // Type of token (e.g., "bearer")
+  scope             String? // Scope of OAuth access
+  id_token          String? @db.String // ID token for OAuth
+  session_state     String? // Session state for OAuth
+  user              User    @relation(fields: [userId], references: [id]) // Relation to the User model
+
+  @@unique([provider, providerAccountId]) // Ensures unique provider accounts
+}
+
+model Session {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  sessionToken String   @unique // Unique session token for the session
+  userId       String   @db.ObjectId // User ID associated with the session
+  user         User     @relation(fields: [userId], references: [id]) // Relation to the User model
+  expires      DateTime @default(now()) // Session expiration timestamp
+}
