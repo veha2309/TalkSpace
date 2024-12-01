@@ -14,9 +14,6 @@ const getConversations = async () => {
             participants: {
                 some: { userId: currentUser.id }, // Check if the current user is a participant
             },
-            NOT: {
-                deletedBy: { has: currentUser.id }, // Exclude conversations the user has deleted
-            },
         },
         include: {
             participants: {

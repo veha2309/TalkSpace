@@ -14,11 +14,12 @@ import { pusherClient } from "@/app/libs/pusher";
 import { find } from "lodash";
 
 interface ConversationListProps {
-    initialItems: FullConversationType[];
-    users: User[];
+    initialItems: FullConversationType[]; // List of conversations (initial state)
+    users: User[]; // List of users (participants in the conversations)
 }
 
 const ConversationList: React.FC<ConversationListProps> = ({ initialItems, users }) => {
+    console.log(initialItems)
     const session = useSession();
     const [items, setItems] = useState(initialItems);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -26,6 +27,7 @@ const ConversationList: React.FC<ConversationListProps> = ({ initialItems, users
     const { conversationId, isOpen } = useConversation();
 
     const pusherKey = useMemo(() => session.data?.user?.email, [session.data?.user?.email]);
+    console.log(pusherKey)
 
     useEffect(() => {
         if (typeof window === 'undefined' || !pusherKey) {
@@ -36,10 +38,11 @@ const ConversationList: React.FC<ConversationListProps> = ({ initialItems, users
 
         const newConversationHandler = (conversation: FullConversationType) => {
             setItems((current) => {
-                if (find(current, { id: conversationId })) {
+                // Prevent duplicate conversations
+                if (find(current, { id: conversation.id })) {
                     return current;
                 }
-                return [conversation, ...current];
+                return [conversation, ...current]; // Add new conversation to the list
             });
         };
 
@@ -48,7 +51,7 @@ const ConversationList: React.FC<ConversationListProps> = ({ initialItems, users
                 if (currentConversation.id === conversation.id) {
                     return {
                         ...currentConversation,
-                        messages: conversation.messages
+                        messages: conversation.messages // Update messages in the conversation
                     };
                 }
                 return currentConversation;
@@ -59,22 +62,26 @@ const ConversationList: React.FC<ConversationListProps> = ({ initialItems, users
             setItems((current) => current.filter((convo) => convo.id !== conversation.id));
 
             if (conversationId === conversation.id) {
-                router.push('/conversations');
+                router.push('/conversations'); // Redirect if the conversation was removed
             }
         };
 
-        pusherClient.bind('conversation:new', newConversationHandler);
-        pusherClient.bind('conversation:update', updateHandler);
-        pusherClient.bind('conversation:remove', removeHandler);
+        // Bind to Pusher events
+        pusherClient.bind('conversations:new', newConversationHandler);
+        pusherClient.bind('conversations:update', updateHandler);
+        pusherClient.bind('conversations:remove', removeHandler);
 
         return () => {
+            // Cleanup Pusher bindings on component unmount
             pusherClient.unsubscribe(pusherKey);
             pusherClient.unbind('conversation:new', newConversationHandler);
             pusherClient.unbind('conversation:update', updateHandler);
             pusherClient.unbind('conversation:remove', removeHandler);
+
         };
     }, [pusherKey, conversationId, router]);
 
+    console.log(items)
     return (
         <>
             <GroupChatModal
@@ -102,8 +109,8 @@ const ConversationList: React.FC<ConversationListProps> = ({ initialItems, users
                         items.map((item) => (
                             <ConversationBox
                                 key={item.id}
-                                data={item}
-                                selected={conversationId === item.id}
+                                data={item} // Display the conversation data
+                                selected={conversationId === item.id} // Highlight the selected conversation
                             />
                         ))
                     ) : (

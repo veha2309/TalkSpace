@@ -5,32 +5,46 @@ import Header from "./components/Header";
 import Body from "./components/Body";
 import Form from "./components/Form";
 
+interface IParams {
+    conversationId: string;
+}
 
-export default async function ConversationPage({
-    params,
-}: {
-    params: { conversationId: string };
-}) {
-    const conversation = await getConversationById(params.conversationId);
-    const messages = await getMessages(params.conversationId);
+const ConversationPage = async ({ params }: { params: IParams }) => {
+    try {
+        const { conversationId } = await params;
 
-    if (!conversation) {
+        const conversation = await getConversationById(conversationId);
+        const messages = await getMessages(conversationId);
+
+        if (!conversation) {
+            return (
+                <div className="lg:pl-80 h-full">
+                    <div className="h-full flex flex-col">
+                        <EmptyState />
+                    </div>
+                </div>
+            );
+        }
+
         return (
             <div className="lg:pl-80 h-full">
                 <div className="h-full flex flex-col">
-                    <EmptyState message="Conversation not found." />
+                    <Header conversation={conversation} />
+                    <Body initialMessages={messages} />
+                    <Form />
+                </div>
+            </div>
+        );
+    } catch (error: unknown) {
+        console.log("CONVERSATION_LOADING_ERROR:", error);
+        return (
+            <div className="lg:pl-80 h-full">
+                <div className="h-full flex flex-col">
+                    <EmptyState message="Failed to load conversation." />
                 </div>
             </div>
         );
     }
+};
 
-    return (
-        <div className="lg:pl-80 h-full">
-            <div className="h-full flex flex-col">
-                <Header conversation={conversation} />
-                <Body initialMessages={messages} />
-                <Form />
-            </div>
-        </div>
-    );
-}
+export default ConversationPage;
