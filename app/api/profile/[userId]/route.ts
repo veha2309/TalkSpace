@@ -1,15 +1,12 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prismadb";
 
-interface Context {
-  params: {
-    userId: string;
-  };
-}
-
-export async function GET(request: Request, context: Context) {
+export async function GET(
+  request: Request,
+  { params }: { params: { userId: string } }
+) {
   try {
-    const { userId } = context.params;
+    const { userId } = params;
 
     if (!userId) {
       return NextResponse.json(
