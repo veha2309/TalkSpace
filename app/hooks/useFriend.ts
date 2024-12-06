@@ -8,20 +8,15 @@ const useIsFriend = (profileUserId: string) => {
 
     useEffect(() => {
         const fetchIsFriend = async () => {
-            try {
                 setLoading(true);
                 setError(null);
 
-                const response = await axios.get(`/api/friend/isfriend`, {
+                await axios.get(`/api/friend/isfriend`, {
                     params: { profileUserId },
-                });
-
-                setIsFriend(response.data.isFriend);
-            } catch (err: any) {
-                setError(err.response?.data?.message || "Error checking friend status");
-            } finally {
-                setLoading(false);
-            }
+                })
+                .then((response) => setIsFriend(response.data.isFriend))
+                .catch ((err)=>setError(err?.response?.data?.message || "Error checking friend status"))
+            .finally(()=>setLoading(false))
         };
 
         if (profileUserId) {

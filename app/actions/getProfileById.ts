@@ -16,9 +16,8 @@ const getProfileById = async (userId: string) => {
 
         // Extract users from participants for easier handling in the frontend
 
-        const {hashedPassword, createdAt, emailVerified,updatedAt , ...ProtectedUser} = user
 
-        return ProtectedUser
+        return user
     } catch (error) {
         console.error("Error in getProfileById:", error);
         return null;

@@ -74,7 +74,7 @@ export async function DELETE(
         }
         
         if (allDeleted) {
-            const deletedConvo = await prisma.conversation.delete({
+            await prisma.conversation.delete({
                 where: { id: conversationId },
             });
 

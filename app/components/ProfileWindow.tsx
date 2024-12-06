@@ -8,6 +8,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import LoadingModal from "./LoadingModal";
+import { error } from "console";
 
 type user = {
     id: string
@@ -18,12 +19,10 @@ type user = {
 
 interface ProfileWindowProps {
     user: user;
-    show?: boolean
 };
 
 const ProfileWindow: React.FC<ProfileWindowProps> = ({
     user,
-    show
 }) => {
 
     const router = useRouter();
@@ -34,19 +33,18 @@ const ProfileWindow: React.FC<ProfileWindowProps> = ({
     const [isFriend, setIsFriend] = useState<boolean | null>(null);
 
     const fetchIsFriend = async () => {
-        try {
-            const response = await axios.get(`/api/friend/isfriend`, {
+            await axios.get(`/api/friend/isfriend`, {
                 params: { profileUserId: user.id },
-            });
-            setIsFriend(response.data.isFriend);
-        } catch (error) {
-            toast.error("Failed to fetch friend status");
-        }
+            }).then((response)=>setIsFriend(response.data.isFriend))
+            .catch((error) => {
+                toast.error(error?.response?.data?.message|| "Something went wrong")
+            })
+            
     };
 
     useEffect(() => {
         fetchIsFriend();
-    }, [user.id]);
+    }, [fetchIsFriend]);
 
 
 
@@ -66,7 +64,7 @@ const ProfileWindow: React.FC<ProfileWindowProps> = ({
                 setIsFriend(false);
             });
 
-    }, [])
+    }, [user.id])
 
     const conversationCreate = useCallback(() => {
         setIsLoading(true);

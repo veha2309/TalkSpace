@@ -44,7 +44,7 @@ const useRoutes = () =>{
         },
        
     ]
-    , [pathname])
+    , [pathname , conversationId])
 
     return routes
 }
