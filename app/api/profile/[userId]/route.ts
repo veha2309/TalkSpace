@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prismadb";
 
+
+
 export async function GET(
     request: Request,
-    context: { params: { userId: string } }
+    { params }: { params: { userId: string } }
 ) {
-    try {
-        // Use destructuring to await the params safely
-        const { userId } = context.params;
+    const { userId } = params;
 
         if (!userId) {
             return NextResponse.json(
