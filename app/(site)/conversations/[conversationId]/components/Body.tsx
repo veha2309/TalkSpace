@@ -33,7 +33,9 @@ const Body: React.FC<BodyProps> = ({
         pusherClient.subscribe(conversationId);
         bottomRef?.current?.scrollIntoView();
         const messageHandler = (message: FullMessageType) => {
-            axios.post(`/api/conversations/${conversationId}/seen`)
+            axios.post(`/api/conversations/${conversationId}/seen` , {
+                conversationId
+            })
 
             setMessages((current) => {
                 if(find(current, { id: message.id })) {
