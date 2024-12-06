@@ -7,7 +7,7 @@ export async function GET(
     request: Request,
     { params }: { params: { userId: string } }
 ) {
-    const { userId } = params;
+    try{const { userId } = params;
 
         if (!userId) {
             return NextResponse.json(
