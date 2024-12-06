@@ -2,7 +2,6 @@
 
 import Avatar from "@/app/components/Avatar";
 import useOtherUser from "@/app/hooks/useOtherUser";
-import { Conversation, User } from "@prisma/client";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { HiChevronLeft } from "react-icons/hi";
@@ -10,11 +9,10 @@ import { HiEllipsisHorizontal } from "react-icons/hi2";
 import ProfileDrawer from "./ProfileDrawer";
 import AvatarGroup from "@/app/components/AvatarGroup";
 import useActiveList from "@/app/hooks/useActiveList";
+import { FullConversationType } from "@/app/types";
 
 interface HeaderProps {
-    conversation: Conversation & {
-        users: User[]
-    }
+    conversation: FullConversationType
 }
 
 const Header: React.FC<HeaderProps> = ({
@@ -31,7 +29,7 @@ const Header: React.FC<HeaderProps> = ({
 
     const statusText = useMemo(() => {
         if (conversation.isGroup) {
-            return `${conversation.users.length} members`
+            return `${conversation.participants.length} members`
         }
 
         return isActive ? 'Active' : 'Offline'
@@ -68,7 +66,7 @@ const Header: React.FC<HeaderProps> = ({
                     <HiChevronLeft size={32} />
                 </Link>
                 {conversation.isGroup ? (
-                    <AvatarGroup users={conversation.users} />
+                    <AvatarGroup users={conversation.participants} />
                 ) : (
                     <Avatar user={otherUser!} />
                 )}

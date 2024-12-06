@@ -10,13 +10,12 @@ import Avatar from "@/app/components/Avatar"
 import ConfirmModal from "./ConfirmModal"
 import AvatarGroup from "@/app/components/AvatarGroup"
 import useActiveList from "@/app/hooks/useActiveList"
+import { FullConversationType } from "@/app/types"
 
 interface ProfileDrawerProps {
     isOpen: boolean
     onClose: () => void
-    data: Conversation & {
-        users: User[]
-    }
+    data: FullConversationType
 }
 
 const ProfileDrawer: React.FC<ProfileDrawerProps> = ({
@@ -42,7 +41,7 @@ const ProfileDrawer: React.FC<ProfileDrawerProps> = ({
 
     const statusText = useMemo(() => {
         if (data.isGroup) {
-            return `${data.users.length} members`
+            return `${data.participants.length} members`
         }
 
         return isActive ? 'Active' : 'Offline'
@@ -146,7 +145,7 @@ const ProfileDrawer: React.FC<ProfileDrawerProps> = ({
                                                 <div className="flex flex-col items-center">
                                                     <div className="mb-2">
                                                         {data.isGroup ? (
-                                                            <AvatarGroup users={data.users} />
+                                                            <AvatarGroup users={data.participants} />
                                                         ) : (
                                                             <Avatar user={otherUser} />
                                                         )}
@@ -212,7 +211,7 @@ const ProfileDrawer: React.FC<ProfileDrawerProps> = ({
                                                                 text-gray-900
                                                                 sm:col-span-2
                                                                 ">
-                                                                    {data.users.map((user) => user.name).join(', ')}
+                                                                    {data.participants.map((user) => user.name).join(', ')}
                                                                 </dd>
                                                             </div>
                                                         )}
