@@ -2,6 +2,7 @@ import { Message, User } from "@prisma/client";
 
 export type FullMessageType = Message & {
     sender: User;
+    seen: User[];
 };
 
 export type FullConversationType = {
@@ -9,7 +10,7 @@ export type FullConversationType = {
     name: string | null;
     isGroup: boolean;
     messages: FullMessageType[];
-    users: User[]; // Extracted from `participants`
+    participants: User[]; // Extracted from `participants`
     createdAt: Date;
     updatedAt: Date;
     deletedBy: string[]; // User IDs of those who deleted the conversation

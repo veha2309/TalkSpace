@@ -12,11 +12,11 @@ export async function POST(request: Request) {
         const currentUser = await getCurrentUser();
 
         if (!currentPassword) {
-            return NextResponse.json({ error: "Password is required" }, { status: 400 });
+            return NextResponse.json({ message: "Password is required" }, { status: 400 });
         }
 
         if (!currentUser?.email || !currentUser.hashedPassword) {
-            return NextResponse.json({ error: "Missing Info" }, { status: 400 });
+            return NextResponse.json({ message: "Missing Info" }, { status: 400 });
         }
 
         const isValid = await bcrypt.compare(currentPassword, currentUser.hashedPassword)
@@ -24,7 +24,7 @@ export async function POST(request: Request) {
 
     } catch (error: unknown) {
         console.log("VALIDATION_ERROR : ", error);
-        return NextResponse.json({ error: "Internal Error Occured" }, { status: 500 });
+        return NextResponse.json({ message: "Internal Error Occured" }, { status: 500 });
 
     }
 }

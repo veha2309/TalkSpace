@@ -28,17 +28,17 @@ const ProfileDrawer: React.FC<ProfileDrawerProps> = ({
     const [confirmOpen, setConfirmOpen] = useState(false)
 
     const { members } = useActiveList();
-    const isActive = otherUser.email ? members.indexOf(otherUser.email) !== -1 : false;
+    const isActive = otherUser?.email ? members.indexOf(otherUser.email) !== -1 : false;
 
 
 
     const joinedDate = useMemo(() => {
         return format(new Date(otherUser.createdAt), 'PP');
-    }, [otherUser.createdAt]);
+    }, [otherUser?.createdAt]);
 
     const title = useMemo(() => {
-        return data.name || otherUser.name
-    }, [data.name, otherUser.name]);
+        return data.name || otherUser?.name
+    }, [data.name, otherUser?.name]);
 
     const statusText = useMemo(() => {
         if (data.isGroup) {

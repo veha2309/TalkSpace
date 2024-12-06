@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import AuthContext from "./context/AuthContext";
 import { Toaster } from "react-hot-toast";
+import ActiveStatus from "./components/ActiveStatus";
 
 export const metadata: Metadata = {
   title: "TalkSpace",
@@ -20,6 +21,7 @@ export default function RootLayout({
       >
         <AuthContext>
           <Toaster />
+          <ActiveStatus/>
           {children}
         </AuthContext>
       </body>

@@ -18,10 +18,27 @@ model User {
   conversations ConversationUser[]
   messages      Message[]
   accounts      Account[]
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+  Session       Session[]
 
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  Session   Session[]
+  friendsInitiated Friendship[] @relation("FriendshipUser1")
+  friendsReceived  Friendship[] @relation("FriendshipUser2")
+  seenMessageIds   String[]     @db.ObjectId
+  seenMessages     Message[]    @relation("Seen", fields: [seenMessageIds], references: [id])
+}
+
+model Friendship {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId1   String   @db.ObjectId // ID of the first user
+  userId2   String   @db.ObjectId // ID of the second user
+  createdAt DateTime @default(now()) // Timestamp when the friendship was created
+
+  user1 User @relation("FriendshipUser1", fields: [userId1], references: [id] , onDelete : Cascade)
+  user2 User @relation("FriendshipUser2", fields: [userId2], references: [id] , onDelete : Cascade)
+
+  @@unique([userId1, userId2]) // Ensure each friendship is unique
+  @@unique([userId2, userId1]) // Bi-directional friendship constraint
 }
 
 model Conversation {
@@ -32,7 +49,6 @@ model Conversation {
   messages     Message[] // Link to the messages within the conversation
   createdAt    DateTime           @default(now())
   updatedAt    DateTime           @updatedAt
-  userIds      String[]           @db.ObjectId // List of user IDs in the conversation
 
   deletedBy String[] @db.ObjectId // Array of user IDs who have deleted the conversation
 }
@@ -45,7 +61,8 @@ model Message {
   conversationId String       @db.ObjectId
   conversation   Conversation @relation(fields: [conversationId], references: [id])
   createdAt      DateTime     @default(now())
-  seenBy         String[] // Array of user IDs who have seen the message
+  seenIds        String[]     @db.ObjectId
+  seen           User[]       @relation("Seen", fields: [seenIds], references: [id]) // Array of user IDs who have seen the message
 
   image String? // Optional message image
 }
@@ -55,7 +72,7 @@ model ConversationUser {
   userId         String       @db.ObjectId // User ID for the participant
   conversationId String       @db.ObjectId // Conversation ID
   user           User         @relation(fields: [userId], references: [id]) // Relation to the User model
-  conversation   Conversation @relation(fields: [conversationId], references: [id]) // Relation to the Conversation model
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade) // Relation to the Conversation model
   createdAt      DateTime     @default(now()) // Timestamp when the user was added to the conversation
 }
 

@@ -11,21 +11,27 @@ export async function POST(request: Request) {
         const { userId, isGroup, members, name } = body;
 
         if (!currentUser?.id || !currentUser?.email) {
-            return new NextResponse("Unauthorized", { status: 401 });
+            return NextResponse.json(
+                { message: "Unauthorized" },
+                { status: 401 }
+            );
         }
 
         // Validate group conversation data
         if (isGroup && (!members || members.length < 2 || !name)) {
-            return new NextResponse("Invalid data", { status: 400 });
+            return NextResponse.json(
+                { message: "Invalid data" },
+                { status: 400 }
+            );
         }
 
         // Handle group conversation creation
         if (isGroup) {
-            // Create a new group conversation
             const newConversation = await prisma.conversation.create({
                 data: {
                     name,
                     isGroup,
+                    deletedBy  : [],
                     participants: {
                         create: [
                             ...members.map((member: { value: string }) => ({
@@ -60,7 +66,24 @@ export async function POST(request: Request) {
             return NextResponse.json(newConversation);
         }
 
-        // Handle one-on-one conversation creation
+        // Ensure users are friends before creating a one-on-one conversation
+        const areFriends = await prisma.friendship.findFirst({
+            where: {
+                OR: [
+                    { userId1: currentUser.id, userId2: userId },
+                    { userId1: userId, userId2: currentUser.id },
+                ],
+            },
+        });
+
+        if (!areFriends) {
+            return NextResponse.json(
+                { message: "Users are not friends" },
+                { status: 403 }
+            );
+        }
+
+        // Check for an existing one-on-one conversation
         const existingConversation = await prisma.conversation.findFirst({
             where: {
                 isGroup: false,
@@ -73,15 +96,40 @@ export async function POST(request: Request) {
                     },
                 },
             },
+            include: {
+                participants: {
+                    include: {
+                        user: true,
+                    },
+                },
+            },
         });
 
         if (existingConversation) {
+            // Restore the conversation if it was deleted by the current user
+            if (existingConversation.deletedBy.includes(currentUser.id)) {
+                await prisma.conversation.update({
+                    where: { id: existingConversation.id },
+                    data: {
+                        deletedBy: {
+                            set: existingConversation.deletedBy.filter(
+                                (id) => id !== currentUser.id
+                            ),
+                        },
+                    },
+                });
+
+                return NextResponse.json(existingConversation);
+            }
+
             return NextResponse.json(existingConversation);
         }
 
+        // Create a new one-on-one conversation
         const newConversation = await prisma.conversation.create({
             data: {
                 isGroup: false,
+                deletedBy : [],
                 participants: {
                     create: [
                         { user: { connect: { id: currentUser.id } } },
@@ -112,6 +160,9 @@ export async function POST(request: Request) {
         return NextResponse.json(newConversation);
     } catch (error: unknown) {
         console.error("CONVERSATION_CREATION_ERROR:", error);
-        return new NextResponse("Internal Server Error", { status: 500 });
+        return NextResponse.json(
+            { message: "Internal Server Error" },
+            { status: 500 }
+        );
     }
 }

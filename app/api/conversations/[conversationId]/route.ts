@@ -3,16 +3,15 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prismadb";
 import { pusherServer } from "@/app/libs/pusher";
 
-type Params = Promise<{ conversationId : string }>
-
+type Params = Promise<{ conversationId: string }>;
 
 export async function DELETE(
     request: Request,
-     props : { params: Params },
+    props: { params: Params }
 ) {
     try {
-        const params = await props.params
-        const  conversationId  = params.conversationId;
+        const params = await props.params;
+        const conversationId = params.conversationId;
         const currentUser = await getCurrentUser();
 
         if (!currentUser?.id) {
@@ -24,14 +23,10 @@ export async function DELETE(
         }
 
         const existingConversation = await prisma.conversation.findUnique({
-            where: {
-                id: conversationId,
-            },
+            where: { id: conversationId },
             include: {
                 participants: {
-                    include: {
-                        user: true,
-                    },
+                    include: { user: true },
                 },
             },
         });
@@ -40,16 +35,14 @@ export async function DELETE(
             return new NextResponse("Invalid ID", { status: 400 });
         }
 
-        // Ensure the user is a participant in the conversation
         const isParticipant = existingConversation.participants.some(
-            (participant) => participant.userId === currentUser.id
+            (participant) => participant.user.id === currentUser.id
         );
 
         if (!isParticipant) {
             return new NextResponse("Forbidden", { status: 403 });
         }
 
-        // Soft delete: Add the user's ID to the `deletedBy` array
         const updatedConversation = await prisma.conversation.update({
             where: { id: conversationId },
             data: {
@@ -57,16 +50,50 @@ export async function DELETE(
                     push: currentUser.id,
                 },
             },
+            include: {
+                participants: {
+                    include: { user: true },
+                },
+            },
         });
 
-        // Notify other participants about the removal
+        const allDeleted = updatedConversation.participants.every((participant) =>
+            updatedConversation.deletedBy.includes(participant.user.id)
+        );
+
+
+        if (!allDeleted) {
+            // Notify only the user who deleted the conversation
+            try {
+                pusherServer.trigger(currentUser.email, "conversation:remove", updatedConversation);
+            } catch (error) {
+                console.error("Error notifying user about removal:", error);
+            }
+        
+            return NextResponse.json(updatedConversation);
+        }
+        
+        if (allDeleted) {
+            const deletedConvo = await prisma.conversation.delete({
+                where: { id: conversationId },
+            });
+
+            existingConversation.participants.forEach((participant) => {
+                try {
+                    pusherServer.trigger(participant.user.email, "conversation:remove", { conversationId });
+                } catch (error) {
+                    console.error("Error notifying participant:", error);
+                }
+            });
+
+            return new NextResponse("Conversation permanently deleted", { status: 200 });
+        }
+
         existingConversation.participants.forEach((participant) => {
-            if (participant.user.email) {
-                pusherServer.trigger(
-                    participant.user.email,
-                    "conversation:remove",
-                    updatedConversation
-                );
+            try {
+                pusherServer.trigger(participant.user.email, "conversation:remove", updatedConversation);
+            } catch (error) {
+                console.error("Error notifying participant:", error);
             }
         });
 

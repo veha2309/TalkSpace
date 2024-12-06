@@ -23,8 +23,11 @@ const ConfirmModal: React.FC<ConfrmModalProps> = ({
     const { conversationId } = useConversation();
     const [isLoading, setIsLoading] = useState(false);
 
+    
+
     const onDelete = useCallback(() => {
         setIsLoading(true);
+        
 
         axios.delete(`/api/conversations/${conversationId}`)
             .then(() => {
@@ -32,9 +35,13 @@ const ConfirmModal: React.FC<ConfrmModalProps> = ({
                 router.push('/conversations');
                 router.refresh();
             })
-            .catch(() => toast.error("Something went wrong!"))
+            .catch((error) => {
+                toast.error("Something went wrong!");
+                console.log(error)
+            })
             .finally(() => setIsLoading(false))
     }, [conversationId, router, onClose])
+    
     return (
         <Modal
             isOpen={isOpen}
@@ -75,19 +82,19 @@ const ConfirmModal: React.FC<ConfrmModalProps> = ({
                 </div>
             </div>
             <div className="mt-5 sm:mt-4 sm:flex max-sm:flex max-sm:items-center max-sm:justify-center sm:flex-row-reverse">
-                    <Button
-                        disabled={isLoading}
-                        variant="destructive"
-                        onClick={onDelete}>
-                        Delete
-                    </Button>
-                    <Button
-                        disabled={isLoading}
-                        variant="secondary"
-                        onClick={onClose}>
-                        Cancel
-                    </Button>
-                </div>
+                <Button
+                    disabled={isLoading}
+                    variant="destructive"
+                    onClick={onDelete}>
+                    Delete
+                </Button>
+                <Button
+                    disabled={isLoading}
+                    variant="secondary"
+                    onClick={onClose}>
+                    Cancel
+                </Button>
+            </div>
         </Modal>
     );
 }

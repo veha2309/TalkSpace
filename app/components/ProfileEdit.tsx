@@ -76,7 +76,7 @@ const ProfileEdit: React.FC<ProfileEditProps> = ({
                 }
             })
             .catch((error) => {
-                toast.error(error?.response?.data?.error || "Something went wrong");
+                toast.error(error?.response?.data?.message || "Something went wrong");
                 setIsValid(false);
             })
             .finally(() => {
@@ -93,7 +93,7 @@ const ProfileEdit: React.FC<ProfileEditProps> = ({
                 reset({ password: "" });
             })
             .catch((error) => {
-                toast.error(error?.response?.data?.error || "Something went wrong!");
+                toast.error(error?.response?.data?.message || "Something went wrong!");
                 reset();
             })
             .finally(() => setIsLoading(false))
@@ -106,7 +106,7 @@ const ProfileEdit: React.FC<ProfileEditProps> = ({
                 toast.success("Name Successfully changed");
             })
             .catch((error) => {
-                toast.error(error?.response?.data?.error || "Something went wrong!");
+                toast.error(error?.response?.data?.message || "Something went wrong!");
                 reset();
             })
             .finally(() => setIsLoading(false))

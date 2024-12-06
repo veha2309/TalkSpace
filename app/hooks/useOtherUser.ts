@@ -3,18 +3,24 @@ import { useMemo } from "react";
 import { FullConversationType } from "../types";
 import { User } from "@prisma/client";
 
+const useOtherUser = (
+    conversation: FullConversationType | { users: User[] }
+) => {
+    const { data: session } = useSession();
 
-const useOtherUser = (conversation: FullConversationType | {
-    users: User[]
-}) => {
-    const session = useSession();
     const otherUser = useMemo(() => {
-        const currentUserMail = session?.data?.user?.email;
-        const otherUser = conversation.users.filter((user) => user.email !== currentUserMail);
+        const currentUserMail = session?.user?.email;
 
-        return otherUser[0]
-    }, [session?.data?.user?.email, conversation.users]);
+
+        // Filter out the current user from the conversation's users
+        const filteredUsers = conversation.users.filter(
+            (user) => user.email !== currentUserMail
+        );
+
+        return filteredUsers[0]; // Return the first "other" user or undefined
+    }, [session?.user?.email, conversation.users]);
+
     return otherUser;
-}
+};
 
 export default useOtherUser;

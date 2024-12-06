@@ -40,6 +40,6 @@ export async function POST(
 
     } catch (error: unknown) {
         console.log(error, "ERROR_SETTINGS")
-        return NextResponse.json({ error: "Internal Error Occured" }, { status: 500 })
+        return NextResponse.json({ messsage: "Internal Error Occured" }, { status: 500 })
     }
 }

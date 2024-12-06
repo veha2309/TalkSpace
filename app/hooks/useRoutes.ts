@@ -3,6 +3,7 @@ import { usePathname } from "next/navigation";
 import { HiChat } from 'react-icons/hi'
 import {
     HiArrowLeftOnRectangle,
+    HiHandThumbUp,
     HiUsers,
 } from "react-icons/hi2"
 
@@ -26,7 +27,14 @@ const useRoutes = () =>{
             label: 'Users',
             href: '/home', 
             icon: HiUsers,
-            active : pathname === '/users'
+            active : pathname === '/home'
+        }, 
+        {
+            label : 'Friends',
+            href : '/friends',
+            icon: HiHandThumbUp,
+            active : pathname === '/friends'
+
         },
         {
             label: 'Logout',
@@ -34,6 +42,7 @@ const useRoutes = () =>{
             onClick: () => signOut(),
             icon: HiArrowLeftOnRectangle
         },
+       
     ]
     , [pathname])
 

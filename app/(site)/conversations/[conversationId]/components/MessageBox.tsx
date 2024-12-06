@@ -7,7 +7,7 @@ import { format } from "date-fns";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import { useState } from "react";
-import ImageModal from "./ImageModal";
+import ImageModal from "../../../../components/ImageModal";
 
 interface MessageBoxProps {
     data: FullMessageType
@@ -26,10 +26,11 @@ const MessageBox: React.FC<MessageBoxProps> = ({
 
     const isOwn = session?.data?.user?.email === data?.sender?.email;
 
-    const seenList = (data.seenBy || [])
-        .filter((user) => user !== data?.sender?.id)
-        .map((user) => user)
+    const seenList = (data.seen || [])
+        .filter((user) => user.email !== data?.sender?.email)
+        .map((user) => user.name)
         .join(', ');
+
 
     const container = clsx(
         "flex gap-3",

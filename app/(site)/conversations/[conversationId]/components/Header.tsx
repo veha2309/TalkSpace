@@ -23,9 +23,9 @@ const Header: React.FC<HeaderProps> = ({
     const otherUser = useOtherUser(conversation);
     const [drawerOpen, setDrawerOpen] = useState(false);
 
-    const { members } = useActiveList();
-    const isActive = otherUser.email ? members.indexOf(otherUser.email) !== -1 : false;
 
+    const { members } = useActiveList();
+    const isActive = otherUser?.email ? members.indexOf(otherUser.email) !== -1 : false;
 
 
 
@@ -35,7 +35,7 @@ const Header: React.FC<HeaderProps> = ({
         }
 
         return isActive ? 'Active' : 'Offline'
-    }, [conversation , isActive])
+    }, [conversation, isActive])
 
     return (<>
         <ProfileDrawer
@@ -70,11 +70,11 @@ const Header: React.FC<HeaderProps> = ({
                 {conversation.isGroup ? (
                     <AvatarGroup users={conversation.users} />
                 ) : (
-                    <Avatar user={otherUser} />
+                    <Avatar user={otherUser!} />
                 )}
                 <div className="flex flex-col">
                     <div>
-                        {conversation.name || otherUser.name}
+                        {conversation.name || otherUser?.name}
                     </div>
                     <div className="
                     text-sm

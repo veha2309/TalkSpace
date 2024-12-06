@@ -33,7 +33,7 @@ const ConversationBox: React.FC<ConversationBoxProps> = ({ data, selected }) => 
 
     const hasSeen = useMemo(() => {
         if (!lastMessage) return false;
-        const seenArray = lastMessage.seenBy || [];
+        const seenArray = lastMessage.seenIds || [];
         return seenArray.includes(userEmail || "");
     }, [userEmail, lastMessage]);
 
@@ -56,7 +56,7 @@ const ConversationBox: React.FC<ConversationBoxProps> = ({ data, selected }) => 
         return '';
     }, [lastMessage?.createdAt]);
 
-    return (
+    if(otherUser){return (
         <div
             onClick={handleClick}
             className={clsx(`
@@ -65,7 +65,7 @@ const ConversationBox: React.FC<ConversationBoxProps> = ({ data, selected }) => 
             )}
         >
             {data.isGroup ? (
-                <AvatarGroup users={data.users} />
+                <AvatarGroup users={data.participants} />
             ) : (
                 <Avatar user={otherUser} />
             )}
@@ -90,7 +90,7 @@ const ConversationBox: React.FC<ConversationBoxProps> = ({ data, selected }) => 
                 </div>
             </div>
         </div>
-    );
+    );}
 }
 
 export default ConversationBox;

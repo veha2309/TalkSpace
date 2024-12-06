@@ -11,7 +11,7 @@ export default async function handler(
     const session = await getServerSession(request , response , authOptions)
 
     if (!session?.user?.email) {
-        return response.status(401).json({ error: "Unauthorized" });
+        return response.status(401).json({ message: "Unauthorized" });
     }
     
 

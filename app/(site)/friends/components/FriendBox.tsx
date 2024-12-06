@@ -3,26 +3,26 @@
 import Avatar from "@/app/components/Avatar";
 import LoadingModal from "@/app/components/LoadingModal";
 import { User } from "@prisma/client";
+import axios from "axios";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 
 interface UserBoxProps {
     data: User;
 }
 
-const UserBox: React.FC<UserBoxProps> = ({
+const FriendBox: React.FC<UserBoxProps> = ({
     data,
 }) => {
     const router = useRouter();
     const [isLoading, setIsLoading] = useState(false);
 
-    // Handle making a friend
 
 
     return (
         <>
             {isLoading && (<LoadingModal />)}
-            <div className="w-full relative flex items-center space-x-3 bg-white p-3 hover:bg-neutral-100 rounded-lg transition cursor-pointer" onClick={()=> router.push(`/home/${data.id}`)}>
+            <div className="w-full relative flex items-center space-x-3 bg-white p-3 hover:bg-neutral-100 rounded-lg transition cursor-pointer" onClick={()=>router.push(`/friends/${data.id}`)}>
                 <Avatar user={data} />
                 <div className="min-w-0 flex-1">
                     <div className="focus:outline-none">
@@ -31,11 +31,10 @@ const UserBox: React.FC<UserBoxProps> = ({
                         </div>
                     </div>
                 </div>
-                {/* Add friend button */}
-
+                <span className="text-green-500">Friend</span>
             </div>
         </>
     );
 };
 
-export default UserBox;
+export default FriendBox;

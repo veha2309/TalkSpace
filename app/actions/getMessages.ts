@@ -8,6 +8,7 @@ const getMessages = async (conversationId: string) => {
             },
             include: {
                 sender: true, // Include sender details
+                seen : true,
             },
             orderBy: {
                 createdAt: "asc", // Ensure chronological order
@@ -20,7 +21,7 @@ const getMessages = async (conversationId: string) => {
                 const seenUsers = await prisma.user.findMany({
                     where: {
                         id: {
-                            in: message.seenBy,
+                            in: message.seenIds,
                         },
                     },
                 });

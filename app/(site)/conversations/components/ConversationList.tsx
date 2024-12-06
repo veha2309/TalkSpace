@@ -19,7 +19,6 @@ interface ConversationListProps {
 }
 
 const ConversationList: React.FC<ConversationListProps> = ({ initialItems, users }) => {
-    console.log(initialItems)
     const session = useSession();
     const [items, setItems] = useState(initialItems);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -27,7 +26,6 @@ const ConversationList: React.FC<ConversationListProps> = ({ initialItems, users
     const { conversationId, isOpen } = useConversation();
 
     const pusherKey = useMemo(() => session.data?.user?.email, [session.data?.user?.email]);
-    console.log(pusherKey)
 
     useEffect(() => {
         if (typeof window === 'undefined' || !pusherKey) {
@@ -59,17 +57,20 @@ const ConversationList: React.FC<ConversationListProps> = ({ initialItems, users
         };
 
         const removeHandler = (conversation: FullConversationType) => {
+            // Remove the conversation from the local state
             setItems((current) => current.filter((convo) => convo.id !== conversation.id));
-
+        
+            // Check if the user is viewing the conversation being removed
             if (conversationId === conversation.id) {
-                router.push('/conversations'); // Redirect if the conversation was removed
+                router.push('/conversations'); // Redirect to the main conversations page
             }
         };
+        
 
         // Bind to Pusher events
-        pusherClient.bind('conversations:new', newConversationHandler);
-        pusherClient.bind('conversations:update', updateHandler);
-        pusherClient.bind('conversations:remove', removeHandler);
+        pusherClient.bind('conversation:new', newConversationHandler);
+        pusherClient.bind('conversation:update', updateHandler);
+        pusherClient.bind('conversation:remove', removeHandler);
 
         return () => {
             // Cleanup Pusher bindings on component unmount
@@ -81,7 +82,6 @@ const ConversationList: React.FC<ConversationListProps> = ({ initialItems, users
         };
     }, [pusherKey, conversationId, router]);
 
-    console.log(items)
     return (
         <>
             <GroupChatModal
