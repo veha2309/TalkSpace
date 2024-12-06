@@ -4,15 +4,12 @@ import prisma from "@/lib/prismadb"
 import { pusherServer } from "@/app/libs/pusher";
 
 
-type Params = {conversationId : string}
-
 export async function POST(
     request : Request,
-    props : {params : Params}
 ) {
     try {
         const currentUser = await getCurrentUser();
-        const {conversationId} = props.params
+        const {conversationId} = await request.json()
 
         if(!currentUser?.email || !currentUser?.id) return new NextResponse('Unautharized', {status : 401});
 
