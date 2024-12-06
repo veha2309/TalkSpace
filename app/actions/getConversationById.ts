@@ -1,6 +1,5 @@
 import prisma from "@/lib/prismadb";
 import getCurrentUser from "./getCurrentUser";
-import { Prisma } from "@prisma/client";
 import { FullConversationType } from "@/app/types/index";
 
 const getConversationById = async (conversationId: string): Promise<FullConversationType | null> => {
