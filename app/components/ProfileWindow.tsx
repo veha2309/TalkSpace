@@ -8,7 +8,6 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import LoadingModal from "./LoadingModal";
-import { error } from "console";
 
 type user = {
     id: string
@@ -44,7 +43,7 @@ const ProfileWindow: React.FC<ProfileWindowProps> = ({
 
     useEffect(() => {
         fetchIsFriend();
-    }, [fetchIsFriend]);
+    });
 
 
 
