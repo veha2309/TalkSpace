@@ -4,7 +4,7 @@ import { FullConversationType } from "../types";
 import { User } from "@prisma/client";
 
 const useOtherUser = (
-    conversation: FullConversationType | { users: User[] }
+    conversation: FullConversationType
 ) => {
     const { data: session } = useSession();
 
@@ -13,12 +13,12 @@ const useOtherUser = (
 
 
         // Filter out the current user from the conversation's users
-        const filteredUsers = conversation.users.filter(
+        const filteredUsers = conversation.participants.filter(
             (user) => user.email !== currentUserMail
         );
 
         return filteredUsers[0]; // Return the first "other" user or undefined
-    }, [session?.user?.email, conversation.users]);
+    }, [session?.user?.email, conversation.participants]);
 
     return otherUser;
 };

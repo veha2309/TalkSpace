@@ -1,5 +1,7 @@
 import prisma from "@/lib/prismadb";
 import getCurrentUser from "./getCurrentUser";
+import { FullConversationType } from "../types";
+import { Prisma } from "@prisma/client";
 
 const getConversations = async () => {
     const currentUser = await getCurrentUser();
@@ -14,11 +16,11 @@ const getConversations = async () => {
             participants: {
                 some: { userId: currentUser.id }, // Check if the current user is a participant
             },
-            NOT : {
-                deletedBy : {
-                    has : currentUser.id
-                }
-            }
+            NOT: {
+                deletedBy: {
+                    has: currentUser.id,
+                },
+            },
         },
         include: {
             participants: {
@@ -29,6 +31,7 @@ const getConversations = async () => {
             messages: {
                 include: {
                     sender: true, // Include sender details for each message
+                    seen: true,
                 },
                 orderBy: {
                     createdAt: "desc", // Order messages by creation time
@@ -38,10 +41,29 @@ const getConversations = async () => {
     });
 
     // Transform the data into the expected `FullConversationType`
-    const formattedConversations = conversations.map((conversation) => ({
-        ...conversation,
-        users: conversation.participants.map((participant) => participant.user), // Extract users from participants
-    }));
+    const formattedConversations: FullConversationType[] = conversations.map(
+        (conversation: Prisma.ConversationGetPayload<{
+            include: {
+                participants: {
+                    include: { user: true };
+                };
+                messages: {
+                    include: { sender: true; seen: true };
+                };
+            };
+        }>) => ({
+            id: conversation.id,
+            name: conversation.name,
+            isGroup: conversation.isGroup,
+            messages: conversation.messages,
+            participants: conversation.participants.map(
+                (participant) => participant.user
+            ), // Map participants to User[]
+            createdAt: conversation.createdAt,
+            updatedAt: conversation.updatedAt,
+            deletedBy: conversation.deletedBy,
+        })
+    );
 
     return formattedConversations;
 };
