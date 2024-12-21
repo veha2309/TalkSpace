@@ -110,7 +110,7 @@ const ProfileWindow: React.FC<ProfileWindowProps> = ({
     return (
         <>
         {isLoading && <LoadingModal/>}
-            <div className="flex flex-col h-screen bg-white w-full items-center py-40">
+            <div className="flex flex-col h-full bg-white w-full items-center py-40">
                 <div className="flex flex-col items-center justify-between h-fit gap-20">
                     <ImageModal onClose={() => setIsOpen(false)} src={image} isOpen={isOpen} />
                     <div className="    ">

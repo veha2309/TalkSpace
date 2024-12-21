@@ -1,3 +1,4 @@
+
 import Sidebar from '@/app/components/Sidebar'
 import getUsers from '@/app/actions/getUsers'
 import UserList from './components/UserList';

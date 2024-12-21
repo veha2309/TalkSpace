@@ -1,5 +1,6 @@
 import getProfileById from "@/app/actions/getProfileById";
 import ProfileWindow from "@/app/components/ProfileWindow";
+import clsx from "clsx";
 
 type Params = Promise<{ userId: string }>
 
@@ -15,7 +16,7 @@ const Profile = async (props: { params: Params }) => {
                 lg:pl-80
                 h-full
                 ">
-                <div className="h-screen">
+                <div className={clsx("h-screen")}>                 
                     {user ? <ProfileWindow user={user} /> : <></>}
                 </div>
             </div>

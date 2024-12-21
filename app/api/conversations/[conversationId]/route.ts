@@ -62,6 +62,7 @@ export async function DELETE(
         );
 
 
+
         if (!allDeleted) {
             // Notify only the user who deleted the conversation
             try {
@@ -69,11 +70,10 @@ export async function DELETE(
             } catch (error) {
                 console.error("Error notifying user about removal:", error);
             }
-        
+
             return NextResponse.json(updatedConversation);
         }
-        
-        if (allDeleted) {
+
             await prisma.conversation.delete({
                 where: { id: conversationId },
             });
@@ -86,18 +86,17 @@ export async function DELETE(
                 }
             });
 
-            return new NextResponse("Conversation permanently deleted", { status: 200 });
-        }
+            existingConversation.participants.forEach((participant) => {
+                try {
+                    pusherServer.trigger(participant.user.email, "conversation:remove", updatedConversation);
+                } catch (error) {
+                    console.error("Error notifying participant:", error);
+                }
+            });
 
-        existingConversation.participants.forEach((participant) => {
-            try {
-                pusherServer.trigger(participant.user.email, "conversation:remove", updatedConversation);
-            } catch (error) {
-                console.error("Error notifying participant:", error);
-            }
-        });
 
-        return NextResponse.json(updatedConversation);
+        return new NextResponse("Conversation permanently deleted", { status: 200 });
+
     } catch (error: unknown) {
         console.error("ERROR_CONVERSATION_DELETE:", error);
         return new NextResponse("Internal Server Error", { status: 500 });

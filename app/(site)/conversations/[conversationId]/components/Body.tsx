@@ -55,12 +55,12 @@ const Body: React.FC<BodyProps> = ({
         }
 
         pusherClient.bind('messages:new', messageHandler);
-        pusherClient.bind('message:new' , updateMessageHandler);
+        pusherClient.bind('message:update' , updateMessageHandler);
 
         return () => {
             pusherClient.unsubscribe(conversationId);
             pusherClient.unbind('messages:new', messageHandler)
-            pusherClient.unbind('message:new' , updateMessageHandler);
+            pusherClient.unbind('message:update' , updateMessageHandler);
         }
     }, [conversationId])
 
@@ -68,7 +68,10 @@ const Body: React.FC<BodyProps> = ({
         <div className="flex-1 overflow-y-auto">
             {messages.map((message, i) => {
                 const previousMessage = messages[i - 1];
-                const showSender = !previousMessage || previousMessage.sender.email !== message.sender.email;
+                console.log(message , "::::" , messages)
+
+                const showSender = !previousMessage || previousMessage.senderId !== message.senderId || false;
+                console.log(showSender)
                 return(
                 <MessageBox
                     showSender={showSender}

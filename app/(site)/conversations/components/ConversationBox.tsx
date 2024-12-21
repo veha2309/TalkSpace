@@ -1,7 +1,7 @@
 'use client'
 
 import { FullConversationType } from "@/app/types";
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 import { useSession } from "next-auth/react";
@@ -9,6 +9,7 @@ import clsx from "clsx";
 import useOtherUser from "@/app/hooks/useOtherUser";
 import Avatar from "@/app/components/Avatar";
 import AvatarGroup from "@/app/components/AvatarGroup";
+import { pusherClient } from "@/app/libs/pusher";
 
 interface ConversationBoxProps {
     data: FullConversationType,
@@ -24,6 +25,8 @@ const ConversationBox: React.FC<ConversationBoxProps> = ({ data, selected }) => 
     const handleClick = useCallback(() => {
         router.push(`/conversations/${data.id}`);
     }, [data.id, router]);
+
+
 
     const lastMessage = useMemo(() => {
         return data?.messages?.[data.messages.length - 1];
@@ -49,6 +52,8 @@ const ConversationBox: React.FC<ConversationBoxProps> = ({ data, selected }) => 
         return "Started a Conversation!";
     }, [lastMessage]);
 
+    console.log(lastMessageText)
+
     const formattedDate = useMemo(() => {
         if (lastMessage?.createdAt) {
             return format(new Date(lastMessage.createdAt), 'p');
@@ -56,11 +61,28 @@ const ConversationBox: React.FC<ConversationBoxProps> = ({ data, selected }) => 
         return '';
     }, [lastMessage?.createdAt]);
 
-    if(otherUser){return (
+    useEffect(() => {
+        const channel = pusherClient.subscribe(data.id);
+
+        const handleNewMessage = (newMessage: FullConversationType['messages'][number]) => {
+            // Append the new message to the conversation
+            data.messages = [...data.messages, newMessage];
+        };
+
+        channel.bind('messages:new', handleNewMessage);
+
+        return () => {
+            channel.unbind('messages:new', handleNewMessage);
+            pusherClient.unsubscribe(data.id);
+        };
+    }, [data.id, data.messages]);
+
+    if (!otherUser) return null; // Safeguard for undefined `otherUser`
+    return (
         <div
             onClick={handleClick}
             className={clsx(`
-                w-full relative flex items-center space-x-3 hover:bg-neutral-100 rounded-lg transition cursor-pointer`,
+            w-full relative flex items-center space-x-3 hover:bg-neutral-100 rounded-lg transition cursor-pointer`,
                 selected ? 'bg-neutral-100' : 'bg-white'
             )}
         >
@@ -73,7 +95,7 @@ const ConversationBox: React.FC<ConversationBoxProps> = ({ data, selected }) => 
                 <div className="focus:outline-none">
                     <div className="flex justify-between items-center mb-1">
                         <p className="text-base font-medium text-gray-900">
-                            {data.name || otherUser.name}
+                            {data.name || otherUser.name || "Unknown"}
                         </p>
                         {lastMessage?.createdAt && (
                             <p className="text-xs text-gray-400 font-light">
@@ -90,7 +112,8 @@ const ConversationBox: React.FC<ConversationBoxProps> = ({ data, selected }) => 
                 </div>
             </div>
         </div>
-    );}
+    );
+
 }
 
 export default ConversationBox;

@@ -1,3 +1,4 @@
+
 import getProfileById from "@/app/actions/getProfileById";
 import ProfileWindow from "@/app/components/ProfileWindow";
 
@@ -15,7 +16,7 @@ const HomeProfile = async (props: { params: Params }) => {
                 lg:pl-80
                 h-full
                 ">
-                <div className="h-screen">
+                <div className="h-screen block">
                     {user ? <ProfileWindow user={user} /> : <></>}
                 </div>
             </div>
